@@ -1,13 +1,10 @@
 //1
 function firstSum(arr: number[], total: number) {
     let sortedArr = arr.toSorted()
-    const map = new Map<number, number>();
 
     for (let i = 0; i < sortedArr.length; i++) {
         let difference = total - sortedArr[i];
-        map.set(sortedArr[i], difference)
-        let ans = map.get(sortedArr[i]) + sortedArr[i]
-        if (ans === total && sortedArr.includes(difference)) return [sortedArr[i], difference]
+        if (sortedArr.includes(difference)) return [sortedArr[i], difference]
     }
     return [];
 }
