@@ -1,0 +1,108 @@
+1)
+console.log('1');
+setTimeout(() => console.log('2'), 1);
+let promiseNew = new Promise((resolve) => {
+    console.log('3');
+    resolve();
+});
+promiseNew.then(() => console.log('4'));
+setTimeout(() => console.log('5'));
+console.log('6');
+
+Ответ:
+1 | синхронный код
+3 | переменная promiseNew инициализировалась поэтому там должна выводиться 3
+6 | все еще синхронный код
+4 | синхронный код кончился, начинают отрабатывать микрозадачи
+5 | теперь начинают отрабатывать макрозадачи, первой отработает 5 т.к. у нее таймер меньше чем у 2
+2 | макрозадачи кончились
+
+2)
+let promiseTree = new Promise((resolve, reject) => {
+    resolve("a");
+    console.log("1");
+    setTimeout(() => {
+        console.log("2");
+    }, 0);
+    console.log("3");
+});
+
+Ответ:
+После инициализации переменной promiseTree начнется выполнение тела
+1 | синхронный код
+3 | все еще синхронный
+resolve("a") - это микротаска и она отработает, но в консоль не выведется
+2 | макрозадачи
+
+3)
+let promiseTwo = new Promise((resolve, reject) => {
+    resolve("a");
+});
+
+promiseTwo
+    .then((res) => {
+        return res + "b";
+    })
+    .then((res) => {
+        return res + "с";
+    })
+    .finally((res) => {
+        return res + "!!!!!!!";
+    })
+    .catch((res) => {
+        return res + "d";
+    })
+    .then((res) => {
+        console.log(res);
+    });
+
+Ответ:
+Сначала инициализируется переменная promiseTwo выполняется тело,
+в теле resolve("a") поэтому далее catch не должны отработать.
+Первый then должен отработать, получится ab.
+Второй then тоже отрабатывает, получается abc.
+finally всегда отрабатывает, но он ничего не возвращает, значит у нас все еще abc.
+catch не отработает, он отработал бы в случае если у нас в теле promiseTwo был бы reject("string").
+последний then выведет в консоль abc.
+
+4)
+function doSmth() {
+    return Promise.resolve("123");
+}
+doSmth()
+    .then(function (a) {
+        console.log("1", a);
+        return a;
+    })
+    .then(function (b) {
+        console.log("2", b);
+        return Promise.reject("321");
+    })
+    .catch(function (err) {
+        console.log("3", err);
+    })
+    .then(function (c) {
+        console.log("4", c);
+        return c;
+    });
+Ответ:
+У нас объявлена функция doSmth, потом она вызывается doSmth().
+1. первый then отработает в консоль выведется "1" : "123"
+2. второй then тоже отработает в консоль выведется "2": "123"
+3. третий catch должен отработать так как из предыдущего then вернулся Promise.reject("321"),
+   в консоль выведется "3": "321"
+4. последний then отработает в консоль выведется "4": undefined, так как catch ничего не вернул.
+
+5)
+console.log("1");
+setTimeout(function () {
+    console.log("2");
+}, 0);
+Promise.resolve().then(() => console.log("3"));
+console.log("4");
+
+Ответ:
+1 | синхронный код
+4 | синхронный код
+3 | микрозадача
+2 | макрозадача
