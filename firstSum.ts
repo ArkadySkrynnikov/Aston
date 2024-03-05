@@ -1,4 +1,4 @@
-//1
+//1 убрал  map
 function firstSum(arr: number[], total: number) {
     let sortedArr = arr.toSorted()
 
@@ -6,6 +6,7 @@ function firstSum(arr: number[], total: number) {
         let difference = total - sortedArr[i];
         if (sortedArr.includes(difference)) return [sortedArr[i], difference]
     }
+
     return [];
 }
 
